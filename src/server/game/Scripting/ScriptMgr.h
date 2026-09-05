@@ -472,6 +472,10 @@ public: /* PlayerScript */
     void OnPlayerLearnTaxiNode(Player const* player, uint32 nodeId);
     void OnPlayerBeforeGetLevelForXPGain(Player const* player, uint8& level);
     void OnPlayerAfterTakeItemFromMail(Player* player, Item* item, uint32 count);
+    bool OnPlayerCanLearnSpell(Player* player, uint32 spellId);
+    void OnPlayerBeforeReceiveSpellListFromTrainer(Player* player, Creature* creature, WorldPackets::NPC::TrainerList& trainerList);
+    void OnPlayerGetTrainerSpellState(Player const* player, uint32 trainerId, uint32 spellId, Trainer::SpellState& state);
+    void OnPlayerAfterTrainSpell(Player* player, Creature* creature, uint32 spellId);
 
     // Anti cheat
     void AnticheatSetCanFlybyServer(Player* player, bool apply);

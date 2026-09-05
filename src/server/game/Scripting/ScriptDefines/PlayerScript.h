@@ -23,6 +23,16 @@
 #include "DBCStructure.h"
 #include <vector>
 
+namespace Trainer
+{
+    enum class SpellState : uint8;
+}
+
+namespace WorldPackets::NPC
+{
+    class TrainerList;
+}
+
 // TODO to remove
 #include "AchievementMgr.h"
 #include "KillRewarder.h"
@@ -216,6 +226,10 @@ enum PlayerHook
     PLAYERHOOK_ON_LEARN_TAXI_NODE,
     PLAYERHOOK_ON_BEFORE_GET_LEVEL_FOR_XP_GAIN,
     PLAYERHOOK_ON_AFTER_TAKE_ITEM_FROM_MAIL,
+    PLAYERHOOK_CAN_LEARN_SPELL,
+    PLAYERHOOK_ON_BEFORE_RECEIVE_SPELL_LIST_FROM_TRAINER,
+    PLAYERHOOK_ON_GET_TRAINER_SPELL_STATE,
+    PLAYERHOOK_ON_AFTER_TRAIN_SPELL,
     PLAYERHOOK_END
 };
 
@@ -865,6 +879,62 @@ public:
      * @param count Number of items taken
      */
     virtual void OnPlayerAfterTakeItemFromMail(Player* /*player*/, Item* /*item*/, uint32 /*count*/) {}
+
+    /**
+     * @brief This hook is called before a player learns a spell, and can cancel the learning.
+     *
+     * It fires late, once its caller has committed to learning, and refusing here does not undo any of
+     * what that caller has already done: a trainer has taken the money and still reports the purchase
+     * as a success, and Player::LearnTalent has already spent the talent point and recorded the
+     * talent. Some callers have a hook of their own that runs before they commit to anything: use
+     * OnPlayerCanLearnTalent to stop a talent, rather than refusing its spell here.
+     *
+     * A few trainer entries are a wrapper around other spells rather than a spell of their own -- a
+     * paladin's Summon Warhorse hands over both the mount and Apprentice Riding. A wrapper is cast
+     * rather than learned, so this hook never sees it; it sees what the wrapper hands over instead.
+     *
+     * @param player Contains information about the Player
+     * @param spellId The id of the spell about to be learned
+     *
+     * @return true if the player is allowed to learn the spell
+     */
+    [[nodiscard]] virtual bool OnPlayerCanLearnSpell(Player* /*player*/, uint32 /*spellId*/) { return true; }
+
+    /**
+     * @brief This hook is called before a trainer's spell list is sent to a player, and can edit
+     *        the spells the trainer window will display.
+     *
+     * Editing the list only changes what the window shows. Whether the trainer will teach a spell is
+     * decided by its state, so one dropped here can still be bought by a client that asks for it
+     * directly -- refuse it in OnPlayerGetTrainerSpellState as well to make it stick.
+     *
+     * @param player Contains information about the Player
+     * @param creature Contains information about the trainer
+     * @param trainerList The list of spells the trainer is about to display to the player
+     */
+    virtual void OnPlayerBeforeReceiveSpellListFromTrainer(Player* /*player*/, Creature* /*creature*/, WorldPackets::NPC::TrainerList& /*trainerList*/) {}
+
+    /**
+     * @brief This hook is called when a trainer resolves the state one of its spells is in for a
+     *        player, and can override it. The state decides both how the spell is displayed and
+     *        whether the trainer accepts teaching it, so overriding it here keeps the two in step.
+     *
+     * @param player Contains information about the Player
+     * @param trainerId The id of the trainer holding the spell
+     * @param spellId The id of the trainer spell whose state is being resolved
+     * @param state The state the trainer worked out, to be read and overwritten
+     */
+    virtual void OnPlayerGetTrainerSpellState(Player const* /*player*/, uint32 /*trainerId*/, uint32 /*spellId*/, Trainer::SpellState& /*state*/) {}
+
+    /**
+     * @brief This hook is called after a trainer taught a spell to a player, once the money has
+     *        been taken and the spell handed over.
+     *
+     * @param player Contains information about the Player
+     * @param creature Contains information about the trainer
+     * @param spellId The id of the trainer spell that was bought
+     */
+    virtual void OnPlayerAfterTrainSpell(Player* /*player*/, Creature* /*creature*/, uint32 /*spellId*/) {}
 };
 
 #endif
