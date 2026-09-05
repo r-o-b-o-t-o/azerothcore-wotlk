@@ -954,6 +954,16 @@ void ScriptMgr::OnPlayerBeforeGetLevelForXPGain(Player const* player, uint8& lev
     level = std::clamp(level, uint8(1), uint8(sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL)));
 }
 
+bool ScriptMgr::OnPlayerCanTakeQuest(Player* player, Quest const* quest)
+{
+    CALL_ENABLED_BOOLEAN_HOOKS(PlayerScript, PLAYERHOOK_CAN_TAKE_QUEST, !script->OnPlayerCanTakeQuest(player, quest));
+}
+
+bool ScriptMgr::OnPlayerCanRewardQuest(Player* player, Quest const* quest)
+{
+    CALL_ENABLED_BOOLEAN_HOOKS(PlayerScript, PLAYERHOOK_CAN_REWARD_QUEST, !script->OnPlayerCanRewardQuest(player, quest));
+}
+
 PlayerScript::PlayerScript(char const* name, std::vector<uint16> enabledHooks)
     : ScriptObject(name, PLAYERHOOK_END)
 {

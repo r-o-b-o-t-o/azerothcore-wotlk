@@ -215,6 +215,8 @@ enum PlayerHook
     PLAYERHOOK_ON_GET_REPUTATION_PRICE_DISCOUNT,
     PLAYERHOOK_ON_LEARN_TAXI_NODE,
     PLAYERHOOK_ON_BEFORE_GET_LEVEL_FOR_XP_GAIN,
+    PLAYERHOOK_CAN_TAKE_QUEST,
+    PLAYERHOOK_CAN_REWARD_QUEST,
     PLAYERHOOK_END
 };
 
@@ -853,6 +855,28 @@ public:
      * @param level The level that should be used for XP gain calculations
      */
     virtual void OnPlayerBeforeGetLevelForXPGain(Player const* /*player*/, uint8& /*level*/) {}
+
+    /**
+     * @brief This hook is called before a player can take a quest, and can prevent it from being
+     *        taken. Quest givers still display their "!".
+     *
+     * @param player Contains information about the Player
+     * @param quest Contains information about the quest
+     *
+     * @return true if the player is allowed to take the quest
+     */
+    [[nodiscard]] virtual bool OnPlayerCanTakeQuest(Player* /*player*/, Quest const* /*quest*/) { return true; }
+
+    /**
+     * @brief This hook is called before a player can turn a quest in, and can prevent the turn-in.
+     *        Quest enders still display their "?", which is worked out from the quest's status.
+     *
+     * @param player Contains information about the Player
+     * @param quest Contains information about the quest
+     *
+     * @return true if the player is allowed to turn the quest in
+     */
+    [[nodiscard]] virtual bool OnPlayerCanRewardQuest(Player* /*player*/, Quest const* /*quest*/) { return true; }
 };
 
 #endif
