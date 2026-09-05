@@ -16,8 +16,10 @@
  */
 
 #include "PlayerScript.h"
+#include "NPCPackets.h"
 #include "ScriptMgr.h"
 #include "ScriptMgrMacros.h"
+#include "Trainer.h"
 #include "World.h"
 
 #include <algorithm>
@@ -952,6 +954,26 @@ void ScriptMgr::OnPlayerBeforeGetLevelForXPGain(Player const* player, uint8& lev
 {
     CALL_ENABLED_HOOKS(PlayerScript, PLAYERHOOK_ON_BEFORE_GET_LEVEL_FOR_XP_GAIN, script->OnPlayerBeforeGetLevelForXPGain(player, level));
     level = std::clamp(level, uint8(1), uint8(sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL)));
+}
+
+bool ScriptMgr::OnPlayerCanLearnSpell(Player* player, uint32 spellId)
+{
+    CALL_ENABLED_BOOLEAN_HOOKS(PlayerScript, PLAYERHOOK_CAN_LEARN_SPELL, !script->OnPlayerCanLearnSpell(player, spellId));
+}
+
+void ScriptMgr::OnPlayerBeforeReceiveSpellListFromTrainer(Player* player, Creature* creature, WorldPackets::NPC::TrainerList& trainerList)
+{
+    CALL_ENABLED_HOOKS(PlayerScript, PLAYERHOOK_ON_BEFORE_RECEIVE_SPELL_LIST_FROM_TRAINER, script->OnPlayerBeforeReceiveSpellListFromTrainer(player, creature, trainerList));
+}
+
+void ScriptMgr::OnPlayerGetTrainerSpellState(Player const* player, uint32 trainerId, uint32 spellId, Trainer::SpellState& state)
+{
+    CALL_ENABLED_HOOKS(PlayerScript, PLAYERHOOK_ON_GET_TRAINER_SPELL_STATE, script->OnPlayerGetTrainerSpellState(player, trainerId, spellId, state));
+}
+
+void ScriptMgr::OnPlayerAfterTrainSpell(Player* player, Creature* creature, uint32 spellId)
+{
+    CALL_ENABLED_HOOKS(PlayerScript, PLAYERHOOK_ON_AFTER_TRAIN_SPELL, script->OnPlayerAfterTrainSpell(player, creature, spellId));
 }
 
 PlayerScript::PlayerScript(char const* name, std::vector<uint16> enabledHooks)

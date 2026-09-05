@@ -471,6 +471,10 @@ public: /* PlayerScript */
     void OnPlayerGetReputationPriceDiscount(Player const* player, FactionTemplateEntry const* factionTemplate, float& discount);
     void OnPlayerLearnTaxiNode(Player const* player, uint32 nodeId);
     void OnPlayerBeforeGetLevelForXPGain(Player const* player, uint8& level);
+    bool OnPlayerCanLearnSpell(Player* player, uint32 spellId);
+    void OnPlayerBeforeReceiveSpellListFromTrainer(Player* player, Creature* creature, WorldPackets::NPC::TrainerList& trainerList);
+    void OnPlayerGetTrainerSpellState(Player const* player, uint32 trainerId, uint32 spellId, Trainer::SpellState& state);
+    void OnPlayerAfterTrainSpell(Player* player, Creature* creature, uint32 spellId);
 
     // Anti cheat
     void AnticheatSetCanFlybyServer(Player* player, bool apply);
