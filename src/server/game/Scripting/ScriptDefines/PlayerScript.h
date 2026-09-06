@@ -23,6 +23,10 @@
 #include "DBCStructure.h"
 #include <vector>
 
+// TODO to remove
+#include "AchievementMgr.h"
+#include "KillRewarder.h"
+
 namespace Trainer
 {
     enum class SpellState : uint8;
@@ -32,10 +36,6 @@ namespace WorldPackets::NPC
 {
     class TrainerList;
 }
-
-// TODO to remove
-#include "AchievementMgr.h"
-#include "KillRewarder.h"
 
 enum PlayerHook
 {
